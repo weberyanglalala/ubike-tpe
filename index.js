@@ -52,7 +52,7 @@ async function getDataFromUrl(url) {
 function setMarkers(data) {
   if (markers) markers.clearLayers();
   for (let i = 0; i < data.length; i++) {
-    let marker = L.marker([data[i].lat, data[i].lng]);
+    let marker = L.marker([data[i].latitude, data[i].longitude]);
     if (data[i].act === "1") {
       data[i].icon = "fa-check";
     } else {
@@ -74,9 +74,9 @@ function setMarkers(data) {
       <tbody>
         <tr>
           <th scope="row"><i class="fa-solid ${data[i].icon}"></i></th>
-          <td>${data[i].tot}</td>
-          <td>${data[i].sbi}</td>
-          <td>${data[i].bemp}</td>
+          <td>${data[i].total}</td>
+          <td>${data[i].available_rent_bikes}</td>
+          <td>${data[i].available_return_bikes}</td>
         </tr>
       </tbody>
     </table>
@@ -126,13 +126,13 @@ function renderResultPanel(districtName) {
           <tbody>
             <tr>
               <th scope="row"><i class="fa-solid ${station.icon}"></i></th>
-              <td>${station.tot}</td>
-              <td>${station.sbi}</td>
-              <td>${station.bemp}</td>
+              <td>${station.total}</td>
+              <td>${station.available_rent_bikes}</td>
+              <td>${station.available_rent_bikes}</td>
             </tr>
           </tbody>
         </table>
-        <button class="btn btn-primary" onclick="setPosition(${station.lat}, ${station.lng})">前往地點</button>
+        <button class="btn btn-primary" onclick="setPosition(${station.latitude}, ${station.longitude})">前往地點</button>
       </div>`;
       const stationEl = document.createElement("div");
       stationEl.innerHTML = stationDetail;
