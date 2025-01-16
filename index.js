@@ -1,7 +1,7 @@
 // global variables
 const districtSelect = document.querySelector("#district-select");
 const resultPanel = document.querySelector("#result-panel");
-const districtBtns = document.querySelectorAll(".district-btn");
+
 let originalData;
 let districtData;
 let bikeAreaData;
@@ -37,8 +37,16 @@ window.onload = async function () {
       setBikeAreaData(originalData);
       generateDistrictList();
     })
+    .then(() => {
+      districtSelect.addEventListener("change", handleDistrictDropdownChange);
+    })
     .catch((err) => console.log("cannot get bike data"));
 };
+
+function getTravelRecommendation(e) {
+  // todo
+  console.log("get travel recommendation")
+}
 
 async function getDataFromUrl(url) {
   try {
@@ -101,19 +109,22 @@ function generateDistrictList() {
 }
 
 function renderResultPanel(districtName) {
+  resultPanel.innerHTML = "";
+
   const stations = originalData.filter(
     (station) => station.sarea === districtName
   );
-  resultPanel.innerHTML = "";
 
   if (stations.count === 0) {
     resultPanel.innerHTML = "查無此地區資料查無此地區資料";
-  } else {
-    stations.forEach((station) => {
-      const stationTitle = station.sna.split("_")[1];
-      const stationDetail = `<div class="card mb-3 p-3">
-        <p class="text-dark">站名：${stationTitle}</p>
-        <p class="text-dark">位置：${station.ar}</p>
+    return;
+  }
+
+  stations.forEach((station) => {
+    const stationTitle = station.sna.split("_")[1];
+    const stationDetail = `<div class="card mb-3 p-3">
+        <p class="text-dark station-name">站名：${stationTitle}</p>
+        <p class="text-dark station-location">位置：${station.ar}</p>
         <table class="table text-center table-striped">
           <thead>
             <tr>
@@ -132,26 +143,33 @@ function renderResultPanel(districtName) {
             </tr>
           </tbody>
         </table>
-        <button class="btn btn-primary" onclick="setPosition(${station.latitude}, ${station.longitude})">前往地點</button>
+        <div class="btn-group" role="group">
+          <button class="btn btn-primary" onclick="handleSetPosition(${station.latitude}, ${station.longitude})">前往地點</button>
+          <button class="btn btn-secondary travel-recommendation-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+            查詢旅遊推薦
+          </button>
+        </div>
       </div>`;
-      const stationEl = document.createElement("div");
-      stationEl.innerHTML = stationDetail;
-      resultPanel.appendChild(stationEl);
-    });
-  }
+    const stationEl = document.createElement("div");
+    stationEl.innerHTML = stationDetail;
+    resultPanel.appendChild(stationEl);
+  });
 }
 
-function setPosition(lat, lng) {
+function handleSetPosition(lat, lng) {
   map.setView([lat, lng], 18);
 }
 
-districtSelect.addEventListener("change", function () {
+function handleDistrictDropdownChange() {
   const result = districtData.find(
     (district) => district.District === this.value
   );
   map.setView([result.Lat, result.Lng], 15);
   renderResultPanel(this.value);
-});
+  document.querySelectorAll(".travel-recommendation-btn").forEach((btn) => {
+    btn.addEventListener("click", getTravelRecommendation);
+  });
+}
 
 // accumulator, currentValue
 Array.prototype.groupBy = function (prop) {
